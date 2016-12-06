@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">Broyhill Turbine Monitor</string>
+    <string name="turbine">Turbine</string>
+    <string name="details">Details</string>
+    <string name="history">History</string>
+    <string name="project">Project</string>
+    <string name="wind_speed">Wind Speed:</string>
+    <string name="wind_orient">Wind Direction:</string>
+    <string name="output">Power Output:</string>
+    <string name="history_text_intro">
+        The Broyhill Wind Turbine is a project of the Appalachian
+        State University Renewable Energy Initiative (ASUREI).
+    </string>
+    <string name="history_text_specs">
+        The turbine is a Northern Power Systems Northwind 100 kW turbine,
+        with 21 meter blades on a 37 meter tower.
+    </string>
+    <string name="history_text_cost">
+        ASUREI partnered with New River Light and Power to build the turbine,
+        with ASUREI contributing $319,800 and NRLP contributing the remaining
+        $213,200.
+    </string>
+    <string name="history_text_location">
+        It is located at the Broyhill Inn and Conference Center,
+        775 Bodenheimer Dr., Boone, NC.
+    </string>
+    <string name="history_text_facts">
+        The Broyhill Wind Turbine is the largest wind turbine in North Carolina,
+        and produces up to 147,000 kWh annually.
+    </string>
+    <string name="history_text_date">
+        It was place into service on June 22, 2009.
+    </string>
 </resources>
