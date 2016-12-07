@@ -5,11 +5,16 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,11 +31,8 @@ import android.widget.TextView;
 
 public class TurbineFragment extends Fragment{
 
-    private static final String TAG = "TurbineFragment";
-
     private TurbineData mTurbineData;
-    private Handler mHandler;
-    private Runnable mUpdateRunnable;
+    private BroadcastReceiver mReceiver;
     private ObjectAnimator mTurbineAnimator;
 
     private View mTurbineView;
@@ -39,15 +41,17 @@ public class TurbineFragment extends Fragment{
     private TextView mWindSpeedView;
     private TextView mPowerOutputView;
 
-    public static TurbineFragment newInstance() {
-        return new TurbineFragment();
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mTurbineData = TurbineData.getInstance();
+        mTurbineData = TurbineData.getInstance(getContext());
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateValues();
+            }
+        };
     }
 
     @Override
@@ -59,37 +63,31 @@ public class TurbineFragment extends Fragment{
         mWindSpeedView = (TextView) view.findViewById(R.id.wind_speed);
         mPowerOutputView = (TextView) view.findViewById(R.id.power_output);
 
-        //Log.d(TAG, "Wind Orientation: " + mTurbineData.getWindOrientation());
-
         animateTurbine();
-
-        mCompassView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setWindOrientation(mTurbineData.getWindOrientation());
-            }
-        });
-
-        mHandler = new Handler();
-        mUpdateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                setWindOrientation(mTurbineData.getWindOrientation());
-                setWindSpeed(mTurbineData.getWindSpeed());
-                setPowerOutput(mTurbineData.getPowerOutput());
-                setRotationSpeed(mTurbineData.getRotationSpeed());
-                mHandler.postDelayed(this, 2000);
-            }
-        };
-        mUpdateRunnable.run();
+        updateValues();
 
         return view;
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mHandler.removeCallbacks(mUpdateRunnable);
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(mReceiver, new IntentFilter("update"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(mReceiver);
+    }
+
+    private void updateValues() {
+        setWindOrientation(mTurbineData.getWindOrientation());
+        setWindSpeed(mTurbineData.getWindSpeed());
+        setPowerOutput(mTurbineData.getPowerOutput());
+        setRotationSpeed(mTurbineData.getRotationSpeed());
     }
 
     private void setWindOrientation(float orientation) {

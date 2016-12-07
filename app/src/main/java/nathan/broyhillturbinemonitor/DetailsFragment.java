@@ -1,11 +1,16 @@
 package nathan.broyhillturbinemonitor;
 
 import android.animation.ObjectAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.ClipDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +31,7 @@ public class DetailsFragment extends Fragment {
             "chd=t:70,30,50,20,70,30,50,20,70,30,50,20&";
 
     private TurbineData mTurbineData;
-    private Handler mHandler;
-    private Runnable mUpdateRunnable;
+    private BroadcastReceiver mReceiver;
 
     private WebView mWebView;
     private ImageView mPowerBar;
@@ -38,7 +42,13 @@ public class DetailsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        mTurbineData = TurbineData.getInstance();
+        mTurbineData = TurbineData.getInstance(getContext());
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                updateValues();
+            }
+        };
     }
 
     @Override
@@ -51,27 +61,28 @@ public class DetailsFragment extends Fragment {
         mWebView.loadUrl(CHART_URL);
         mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.getSettings().setUseWideViewPort(true);
-
-
-        mHandler = new Handler();
-        mUpdateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                double power = mTurbineData.getPowerOutput();
-                setPower(power);
-                setLightBulbs(power);
-                mHandler.postDelayed(this, 2000);
-            }
-        };
-        mUpdateRunnable.run();
-
+        updateValues();
         return view;
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mHandler.removeCallbacks(mUpdateRunnable);
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(mReceiver, new IntentFilter("update"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(mReceiver);
+    }
+
+    private void updateValues() {
+        double power = mTurbineData.getPowerOutput();
+        setPower(power);
+        setLightBulbs(power);
     }
 
     private void setPower(double power) {
@@ -91,4 +102,6 @@ public class DetailsFragment extends Fragment {
         mTextBulbs.setText( String.format(
                 getResources().getString(R.string.number_of), bulbs));
     }
+
+
 }
