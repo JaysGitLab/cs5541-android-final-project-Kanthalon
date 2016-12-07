@@ -5,12 +5,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.ClipDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +23,9 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -26,10 +34,14 @@ import java.util.List;
 
 public class DetailsFragment extends Fragment {
 
+    private static final String TAG = "DetailsFragment";
+    private static final String CHART_BYTES = "CHART_BYTES";
+
     private TurbineData mTurbineData;
     private BroadcastReceiver mReceiver;
+    private byte[] mChartBytes;
 
-    private WebView mWebView;
+    private ImageView mChartView;
     private ImageView mPowerBar;
     private TextView mPowerText;
     private TextView mTextBulbs;
@@ -37,7 +49,6 @@ public class DetailsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         mTurbineData = TurbineData.getInstance(getContext());
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -53,9 +64,12 @@ public class DetailsFragment extends Fragment {
         mPowerBar = (ImageView) view.findViewById(R.id.power_bar);
         mPowerText = (TextView) view.findViewById(R.id.power_text);
         mTextBulbs = (TextView) view.findViewById(R.id.light_bulbs);
-        mWebView = (WebView) view.findViewById(R.id.chart_view);
-        mWebView.getSettings().setLoadWithOverviewMode(true);
-        mWebView.getSettings().setUseWideViewPort(true);
+        mChartView = (ImageView) view.findViewById(R.id.chart_view);
+        if (mChartBytes != null) {
+            Log.d(TAG, "Reloading saved chart");
+            //byte[] bytes = (byte[]) savedInstanceState.getSerializable(CHART_BYTES);
+            mChartView.setImageBitmap(BitmapFactory.decodeByteArray(mChartBytes, 0, mChartBytes.length));
+        }
         updateValues();
         return view;
     }
@@ -78,7 +92,10 @@ public class DetailsFragment extends Fragment {
         double power = mTurbineData.getPowerOutput();
         setPower(power);
         setLightBulbs(power);
-        setChart(mTurbineData.getMonthData());
+        if (mChartView.getDrawable() == null) {
+            Log.d(TAG, "Setting Chart");
+            setChart(mTurbineData.getMonthData());
+        }
     }
 
     private void setPower(double power) {
@@ -104,14 +121,43 @@ public class DetailsFragment extends Fragment {
                 "https://chart.googleapis.com/chart?" +
                 "cht=lc&" +
                 "chs=600x300&" +
-                "chtt=Monthly Output&" +
+                "chtt=Monthly_Output&" +
+                "chxt=y&" +
+                "chxl=1:|kW&" +
                 "chd=t:");
-        builder.append(data.get(0));
+        builder.append(data.get(0).intValue());
         for (int i = 1; i < data.size(); i++) {
             builder.append(',');
-            builder.append(data.get(i));
+            builder.append(data.get(i).intValue());
         }
         builder.append("&");
-        mWebView.loadUrl(builder.toString());
+        Log.d(TAG, "Target URL: " + builder.toString());
+        new ChartFetcherTask(builder.toString()).execute();
+    }
+
+    private class ChartFetcherTask extends AsyncTask<Void, Void, byte[]> {
+        private String mURL;
+
+        public  ChartFetcherTask(String url) {
+            mURL = url;
+        }
+
+        @Override
+        protected byte[] doInBackground(Void... params) {
+            Log.d(TAG, "Getting Chart");
+            try {
+                return new URLFetcher().fetchURL(mURL);
+            } catch (IOException ioe) {
+                Log.e(TAG, "Error loading bytes: " + ioe);
+                return new byte[0];
+            }
+        }
+
+        @Override
+        protected void onPostExecute(byte[] bytes) {
+            mChartBytes = bytes;
+            Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            mChartView.setImageBitmap(bmp);
+        }
     }
 }
