@@ -65,6 +65,9 @@ public class DetailsFragment extends Fragment {
         mPowerText = (TextView) view.findViewById(R.id.power_text);
         mTextBulbs = (TextView) view.findViewById(R.id.light_bulbs);
         mChartView = (ImageView) view.findViewById(R.id.chart_view);
+        if (savedInstanceState != null) {
+            mChartBytes = (byte[]) savedInstanceState.getSerializable(CHART_BYTES);
+        }
         if (mChartBytes != null) {
             Log.d(TAG, "Reloading saved chart");
             //byte[] bytes = (byte[]) savedInstanceState.getSerializable(CHART_BYTES);
@@ -86,6 +89,12 @@ public class DetailsFragment extends Fragment {
         super.onPause();
         LocalBroadcastManager.getInstance(getActivity())
                 .unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(CHART_BYTES, mChartBytes);
     }
 
     private void updateValues() {

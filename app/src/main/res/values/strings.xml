@@ -33,4 +33,11 @@
     <string name="history_text_date">
         It was place into service on June 22, 2009.
     </string>
+    <string name="project_text">
+        There are currently no further (publicly announced) plans for the
+        Broyhill Wind Turbine. However, you can view ASUREI\'s other projects at:
+    </string>
+    <string name="asurei_url">
+        https://rei.appstate.edu/proj
+    </string>
 </resources>

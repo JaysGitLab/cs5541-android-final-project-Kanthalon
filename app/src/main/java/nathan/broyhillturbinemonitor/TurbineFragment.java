@@ -32,6 +32,8 @@ import android.widget.TextView;
 public class TurbineFragment extends Fragment{
 
     private static final String TAG = "TurbineFragment";
+    private static final String COMPASS_ROTATION = "compass rotation";
+    private static final String TURBINE_ROTATION = "turbine rotation";
 
     private TurbineData mTurbineData;
     private BroadcastReceiver mReceiver;
@@ -64,6 +66,11 @@ public class TurbineFragment extends Fragment{
         mWindSpeedView = (TextView) view.findViewById(R.id.wind_speed);
         mPowerOutputView = (TextView) view.findViewById(R.id.power_output);
 
+        if (savedInstanceState != null) {
+            mCompassView.setRotation(savedInstanceState.getFloat(COMPASS_ROTATION));
+            mTurbineView.setRotation(savedInstanceState.getFloat(TURBINE_ROTATION));
+        }
+
         return view;
     }
 
@@ -81,6 +88,13 @@ public class TurbineFragment extends Fragment{
         mTurbineAnimator = null;
         LocalBroadcastManager.getInstance(getActivity())
                 .unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putFloat(COMPASS_ROTATION, mCompassView.getRotation());
+        outState.putFloat(TURBINE_ROTATION, mTurbineView.getRotation());
     }
 
     private void updateValues() {
