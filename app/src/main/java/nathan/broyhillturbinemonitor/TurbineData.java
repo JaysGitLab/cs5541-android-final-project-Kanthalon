@@ -73,8 +73,8 @@ public class TurbineData {
         protected List<Double> doInBackground(Void... params) {
             ArrayList<Double> data = new ArrayList<>();
             data.add((double) rng.nextInt(360));
-            data.add((double) rng.nextInt(60));
-            data.add((double) rng.nextInt(100));
+            data.add((double) rng.nextInt(61));
+            data.add((double) rng.nextInt(101));
             data.add(rng.nextDouble());
             sleep(500);
             return data;

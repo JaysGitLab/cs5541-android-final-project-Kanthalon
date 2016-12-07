@@ -1,5 +1,6 @@
 package nathan.broyhillturbinemonitor;
 
+import android.animation.ObjectAnimator;
 import android.graphics.drawable.ClipDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -77,7 +78,12 @@ public class DetailsFragment extends Fragment {
         mPowerText.setText( String.format(
                 getResources().getString(R.string.power_format), power));
         ClipDrawable pbar = (ClipDrawable) mPowerBar.getDrawable();
-        pbar.setLevel((int) (power * 100));
+        ObjectAnimator animator = ObjectAnimator.ofInt(pbar,
+                "level",
+                pbar.getLevel(),
+                (int) (power * 100))
+                .setDuration(1000);
+        animator.start();
     }
 
     private void setLightBulbs(double power) {
