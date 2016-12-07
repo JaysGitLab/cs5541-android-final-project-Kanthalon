@@ -7,6 +7,8 @@
     <string name="wind_speed">Wind Speed:</string>
     <string name="wind_orient">Wind Direction:</string>
     <string name="output">Power Output:</string>
+    <string name="number_of"> x %d</string>
+    <string name="power_format">%.2f kW</string>
     <string name="history_text_intro">
         The Broyhill Wind Turbine is a project of the Appalachian
         State University Renewable Energy Initiative (ASUREI).
