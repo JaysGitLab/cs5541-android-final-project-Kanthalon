@@ -6,11 +6,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static android.os.SystemClock.sleep;
 
 /**
  * Created by Owner on 12/6/2016.
@@ -23,18 +20,10 @@ public class TurbineData {
 
     private Context mContext;
 
-    private double mWindOrientation;
-    private double mWindSpeed;
-    private double mPowerOutput;
-    private double mRotationSpeed;
-
-    private TurbineData() {}
+    private DataAdapter mData;
 
     private TurbineData(Context context) {
-        mWindOrientation = 0;
-        mWindSpeed = 0;
-        mPowerOutput = 0;
-        mRotationSpeed = 0;
+        mData = new DataAdapter();
         sRNG = new Random();
         mContext = context;
         final Handler dataHandler = new Handler();
@@ -42,7 +31,7 @@ public class TurbineData {
             @Override
             public void run() {
                 new UpdateDataTask().execute();
-                dataHandler.postDelayed(this, 2000);
+                dataHandler.postDelayed(this, 5000);
             }
         };
         dataRunnable.run();
@@ -56,44 +45,38 @@ public class TurbineData {
     }
 
     public float getWindOrientation() {
-        return (float) mWindOrientation;
+        return (float) mData.getWindOrientation();
     }
 
     public float getWindSpeed() {
-        return (float) mWindSpeed;
+        return (float) mData.getWindSpeed();
     }
 
     public float getPowerOutput() {
-        return (float) mPowerOutput;
+        return (float) mData.getPowerOutput();
     }
 
     public float getRotationSpeed() {
-        return (float) mRotationSpeed;
+        return (float) mData.getRotationSpeed();
     }
 
+    public List<Double> getMonthData() {
+        return mData.getMonthData();
+    }
 
-
-    private class UpdateDataTask extends AsyncTask<Void, Void, List<Double>> {
+    private class UpdateDataTask extends AsyncTask<Void, Void, DataAdapter> {
 
         @Override
-        protected List<Double> doInBackground(Void... params) {
+        protected DataAdapter doInBackground(Void... params) {
             // Connect to server and get data
-            ArrayList<Double> data = new ArrayList<>();
-            data.add((double) sRNG.nextInt(360));
-            data.add((double) sRNG.nextInt(61));
-            data.add((double) sRNG.nextInt(101));
-            data.add(sRNG.nextDouble());
-            sleep(500);
+            DataAdapter data = new DataAdapter("insert HTTP response here");
             return data;
         }
 
         @Override
-        protected void onPostExecute(List<Double> data) {
+        protected void onPostExecute(DataAdapter data) {
             // Update local data
-            mWindOrientation = data.get(0);
-            mWindSpeed = data.get(1);
-            mPowerOutput = data.get(2);
-            mRotationSpeed = data.get(3);
+            mData = data;
 
             // Tell active fragments that new data is available
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent("update"));

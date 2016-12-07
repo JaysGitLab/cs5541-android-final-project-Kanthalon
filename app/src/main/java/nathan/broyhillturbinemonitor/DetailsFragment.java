@@ -18,17 +18,13 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by Owner on 11/28/2016.
  */
 
 public class DetailsFragment extends Fragment {
-
-    private static final String CHART_URL = "https://chart.googleapis.com/chart?" +
-            "cht=lc&" +
-            "chs=600x300&" +
-            "chtt=Monthly Output&" +
-            "chd=t:70,30,50,20,70,30,50,20,70,30,50,20&";
 
     private TurbineData mTurbineData;
     private BroadcastReceiver mReceiver;
@@ -58,7 +54,6 @@ public class DetailsFragment extends Fragment {
         mPowerText = (TextView) view.findViewById(R.id.power_text);
         mTextBulbs = (TextView) view.findViewById(R.id.light_bulbs);
         mWebView = (WebView) view.findViewById(R.id.chart_view);
-        mWebView.loadUrl(CHART_URL);
         mWebView.getSettings().setLoadWithOverviewMode(true);
         mWebView.getSettings().setUseWideViewPort(true);
         updateValues();
@@ -83,6 +78,7 @@ public class DetailsFragment extends Fragment {
         double power = mTurbineData.getPowerOutput();
         setPower(power);
         setLightBulbs(power);
+        setChart(mTurbineData.getMonthData());
     }
 
     private void setPower(double power) {
@@ -103,5 +99,19 @@ public class DetailsFragment extends Fragment {
                 getResources().getString(R.string.number_of), bulbs));
     }
 
-
+    private void setChart(List<Double> data) {
+        StringBuilder builder = new StringBuilder(
+                "https://chart.googleapis.com/chart?" +
+                "cht=lc&" +
+                "chs=600x300&" +
+                "chtt=Monthly Output&" +
+                "chd=t:");
+        builder.append(data.get(0));
+        for (int i = 1; i < data.size(); i++) {
+            builder.append(',');
+            builder.append(data.get(i));
+        }
+        builder.append("&");
+        mWebView.loadUrl(builder.toString());
+    }
 }

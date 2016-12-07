@@ -31,6 +31,8 @@ import android.widget.TextView;
 
 public class TurbineFragment extends Fragment{
 
+    private static final String TAG = "TurbineFragment";
+
     private TurbineData mTurbineData;
     private BroadcastReceiver mReceiver;
     private ObjectAnimator mTurbineAnimator;
@@ -44,7 +46,6 @@ public class TurbineFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         mTurbineData = TurbineData.getInstance(getContext());
         mReceiver = new BroadcastReceiver() {
             @Override
@@ -63,15 +64,13 @@ public class TurbineFragment extends Fragment{
         mWindSpeedView = (TextView) view.findViewById(R.id.wind_speed);
         mPowerOutputView = (TextView) view.findViewById(R.id.power_output);
 
-        animateTurbine();
-        updateValues();
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        updateValues();
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(mReceiver, new IntentFilter("update"));
     }
@@ -79,6 +78,7 @@ public class TurbineFragment extends Fragment{
     @Override
     public void onPause() {
         super.onPause();
+        mTurbineAnimator = null;
         LocalBroadcastManager.getInstance(getActivity())
                 .unregisterReceiver(mReceiver);
     }
@@ -87,7 +87,7 @@ public class TurbineFragment extends Fragment{
         setWindOrientation(mTurbineData.getWindOrientation());
         setWindSpeed(mTurbineData.getWindSpeed());
         setPowerOutput(mTurbineData.getPowerOutput());
-        setRotationSpeed(mTurbineData.getRotationSpeed());
+        animateTurbine(mTurbineData.getRotationSpeed());
     }
 
     private void setWindOrientation(float orientation) {
@@ -121,35 +121,24 @@ public class TurbineFragment extends Fragment{
         mPowerOutputView.setText(text);
     }
 
-    private void setRotationSpeed(float speed) {
-        mTurbineAnimator.cancel();
+    private void animateTurbine(float speed) {
         float start = mTurbineView.getRotation() % 360;
         float end = mTurbineView.getRotation() + 360;
-        //float end = (start + (mTurbineData.getRotationSpeed() * 360));
-        mTurbineAnimator.setFloatValues(start, end);
+        if (mTurbineAnimator == null) {
+            Log.d(TAG, "Animator is null");
+            mTurbineAnimator = ObjectAnimator.ofFloat(mTurbineView, "rotation", start, end)
+                    .setDuration(1000);
+            mTurbineAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            mTurbineAnimator.setInterpolator(new LinearInterpolator());
+        } else {
+            Log.d(TAG, "Animator is not null");
+            mTurbineAnimator.cancel();
+            mTurbineAnimator.setFloatValues(start, end);
+        }
         if (speed != 0) {
-
+            Log.d(TAG, "Speed is not 0");
             mTurbineAnimator.setDuration((long) (1000 / speed));
             mTurbineAnimator.start();
         }
-    }
-
-    private void animateTurbine() {
-        float start = mTurbineView.getRotation() % 360;
-        float end = (start + (mTurbineData.getRotationSpeed() * 360));
-        mTurbineAnimator = ObjectAnimator.ofFloat(mTurbineView, "rotation", start, end)
-                .setDuration(1000);
-        /*
-        mTurbineAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-                float start = mTurbineView.getRotation() % 360;
-                float end = (start + (mTurbineData.getRotationSpeed() * 360));
-                ((ObjectAnimator) animation).setFloatValues(start, end);
-            }
-        });*/
-        mTurbineAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        mTurbineAnimator.setInterpolator(new LinearInterpolator());
-        mTurbineAnimator.start();
     }
 }
