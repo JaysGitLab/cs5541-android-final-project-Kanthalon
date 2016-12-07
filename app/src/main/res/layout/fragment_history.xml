@@ -1,46 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/blue_history">
+<LinearLayout android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/blue_history">
+              android:layout_height="wrap_content">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginTop="10sp"
-        android:layout_marginBottom="10sp"
+        android:layout_margin="10sp"
         android:text="@string/history_text_intro"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginBottom="10sp"
+        android:layout_margin="10sp"
         android:text="@string/history_text_location"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginBottom="10sp"
+        android:layout_margin="10sp"
         android:text="@string/history_text_specs"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginBottom="10sp"
+        android:layout_margin="10sp"
         android:text="@string/history_text_cost"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginBottom="10sp"
+        android:layout_margin="10sp"
         android:text="@string/history_text_facts"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_marginBottom="10sp"
+        android:layout_margin="10sp"
         android:text="@string/history_text_date"/>
 
 </LinearLayout>
+</ScrollView>

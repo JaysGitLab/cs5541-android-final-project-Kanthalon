@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +29,9 @@ public class TurbineFragment extends Fragment{
     private static final String TAG = "TurbineFragment";
 
     private TurbineData mTurbineData;
+    private Handler mHandler;
+    private Runnable mUpdateRunnable;
+    private ObjectAnimator mTurbineAnimator;
 
     private View mTurbineView;
     private ImageView mCompassView;
@@ -42,6 +46,7 @@ public class TurbineFragment extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         mTurbineData = TurbineData.getInstance();
     }
 
@@ -56,9 +61,6 @@ public class TurbineFragment extends Fragment{
 
         //Log.d(TAG, "Wind Orientation: " + mTurbineData.getWindOrientation());
 
-        setWindOrientation(mTurbineData.getWindOrientation());
-        setWindSpeed(mTurbineData.getWindSpeed());
-        setPowerOutput(mTurbineData.getPowerOutput());
         animateTurbine();
 
         mCompassView.setOnClickListener(new View.OnClickListener() {
@@ -68,7 +70,26 @@ public class TurbineFragment extends Fragment{
             }
         });
 
+        mHandler = new Handler();
+        mUpdateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                setWindOrientation(mTurbineData.getWindOrientation());
+                setWindSpeed(mTurbineData.getWindSpeed());
+                setPowerOutput(mTurbineData.getPowerOutput());
+                setRotationSpeed(mTurbineData.getRotationSpeed());
+                mHandler.postDelayed(this, 2000);
+            }
+        };
+        mUpdateRunnable.run();
+
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mHandler.removeCallbacks(mUpdateRunnable);
     }
 
     private void setWindOrientation(float orientation) {
@@ -102,21 +123,35 @@ public class TurbineFragment extends Fragment{
         mPowerOutputView.setText(text);
     }
 
+    private void setRotationSpeed(float speed) {
+        mTurbineAnimator.cancel();
+        float start = mTurbineView.getRotation() % 360;
+        float end = mTurbineView.getRotation() + 360;
+        //float end = (start + (mTurbineData.getRotationSpeed() * 360));
+        mTurbineAnimator.setFloatValues(start, end);
+        if (speed != 0) {
+
+            mTurbineAnimator.setDuration((long) (1000 / speed));
+            mTurbineAnimator.start();
+        }
+    }
+
     private void animateTurbine() {
         float start = mTurbineView.getRotation() % 360;
         float end = (start + (mTurbineData.getRotationSpeed() * 360));
-        ObjectAnimator turbineAnimator = ObjectAnimator.ofFloat(mTurbineView, "rotation", start, end)
+        mTurbineAnimator = ObjectAnimator.ofFloat(mTurbineView, "rotation", start, end)
                 .setDuration(1000);
-        turbineAnimator.addListener(new AnimatorListenerAdapter() {
+        /*
+        mTurbineAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationRepeat(Animator animation) {
                 float start = mTurbineView.getRotation() % 360;
                 float end = (start + (mTurbineData.getRotationSpeed() * 360));
                 ((ObjectAnimator) animation).setFloatValues(start, end);
             }
-        });
-        turbineAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        turbineAnimator.setInterpolator(new LinearInterpolator());
-        turbineAnimator.start();
+        });*/
+        mTurbineAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        mTurbineAnimator.setInterpolator(new LinearInterpolator());
+        mTurbineAnimator.start();
     }
 }
