@@ -3,21 +3,32 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/colorAccent">
-
-    <TextView
+              android:background="@color/purple_project">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/project_text"
-        android:textSize="20sp"/>
-    <TextView
-        android:id="@+id/rei_link"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/project_text"
+            android:textSize="20sp"
+            android:layout_margin="10sp"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10sp"
-        android:text="@string/asurei_url"
-        android:textSize="20sp"
-        android:textAlignment="center"
-        android:textColor="@color/colorPrimary"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/rei_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10sp"
+            android:text="@string/asurei_url"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"/>
+    </RelativeLayout>
 
 </LinearLayout>

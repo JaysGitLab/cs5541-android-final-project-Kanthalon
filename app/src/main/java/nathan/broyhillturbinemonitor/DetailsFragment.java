@@ -45,6 +45,7 @@ public class DetailsFragment extends Fragment {
     private ImageView mPowerBar;
     private TextView mPowerText;
     private TextView mTextBulbs;
+    private TextView mTextHouses;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class DetailsFragment extends Fragment {
         mPowerBar = (ImageView) view.findViewById(R.id.power_bar);
         mPowerText = (TextView) view.findViewById(R.id.power_text);
         mTextBulbs = (TextView) view.findViewById(R.id.light_bulbs);
+        mTextHouses = (TextView) view.findViewById(R.id.houses);
         mChartView = (ImageView) view.findViewById(R.id.chart_view);
         if (savedInstanceState != null) {
             mChartBytes = (byte[]) savedInstanceState.getSerializable(CHART_BYTES);
@@ -73,6 +75,8 @@ public class DetailsFragment extends Fragment {
             //byte[] bytes = (byte[]) savedInstanceState.getSerializable(CHART_BYTES);
             mChartView.setImageBitmap(BitmapFactory.decodeByteArray(mChartBytes, 0, mChartBytes.length));
         }
+        ClipDrawable pbar = (ClipDrawable) mPowerBar.getDrawable();
+        pbar.setLevel((int) (mTurbineData.getPowerOutput() * 100));
         updateValues();
         return view;
     }
@@ -101,6 +105,7 @@ public class DetailsFragment extends Fragment {
         double power = mTurbineData.getPowerOutput();
         setPower(power);
         setLightBulbs(power);
+        setHouses(power);
         if (mChartView.getDrawable() == null) {
             Log.d(TAG, "Setting Chart");
             setChart(mTurbineData.getMonthData());
@@ -123,6 +128,12 @@ public class DetailsFragment extends Fragment {
         int bulbs = (int) (power * 100 / 6);
         mTextBulbs.setText( String.format(
                 getResources().getString(R.string.number_of), bulbs));
+    }
+
+    private void setHouses(double power) {
+        int houses = (int) (power / 1.234);
+        mTextHouses.setText( String.format(
+                getResources().getString(R.string.number_of), houses));
     }
 
     private void setChart(List<Double> data) {

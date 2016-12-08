@@ -45,6 +45,9 @@ public class TurbineFragment extends Fragment{
     private TextView mWindSpeedView;
     private TextView mPowerOutputView;
 
+    private float compassRotation;
+    private float turbineRotation;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +74,9 @@ public class TurbineFragment extends Fragment{
             mTurbineView.setRotation(savedInstanceState.getFloat(TURBINE_ROTATION));
         }
 
+        compassRotation = mCompassView.getRotation();
+        turbineRotation = mTurbineView.getRotation();
+
         return view;
     }
 
@@ -88,13 +94,15 @@ public class TurbineFragment extends Fragment{
         mTurbineAnimator = null;
         LocalBroadcastManager.getInstance(getActivity())
                 .unregisterReceiver(mReceiver);
+        compassRotation = mCompassView.getRotation();
+        turbineRotation = mTurbineView.getRotation();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putFloat(COMPASS_ROTATION, mCompassView.getRotation());
-        outState.putFloat(TURBINE_ROTATION, mTurbineView.getRotation());
+        outState.putFloat(COMPASS_ROTATION, compassRotation);
+        outState.putFloat(TURBINE_ROTATION, turbineRotation);
     }
 
     private void updateValues() {
@@ -114,7 +122,7 @@ public class TurbineFragment extends Fragment{
         {
             start += 360;
         }
-        String text = orientation + " Degrees";
+        String text = String.format(getResources().getString(R.string.direction_format), orientation);
         mWindOrientView.setText(text);
         ObjectAnimator compassAnimator = ObjectAnimator.ofFloat(mCompassView,
                 "rotation",
@@ -125,13 +133,13 @@ public class TurbineFragment extends Fragment{
     }
 
     private void setWindSpeed(double speed) {
-        String text = speed + " Mph";
+        String text = String.format(getResources().getString(R.string.speed_format), speed);
         mWindSpeedView.setText(text);
 
     }
 
     private void setPowerOutput(double output) {
-        String text = output + " kW";
+        String text = String.format(getResources().getString(R.string.power_format), output);
         mPowerOutputView.setText(text);
     }
 

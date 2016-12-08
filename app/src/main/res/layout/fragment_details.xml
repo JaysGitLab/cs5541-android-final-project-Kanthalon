@@ -3,7 +3,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/colorPrimaryDark">
+              android:background="@color/blue_details">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,16 +31,31 @@
             android:src="@drawable/loading_bar_partial"
             android:background="@drawable/loading_bar_empty"/>
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_gravity="center">
             <ImageView
                 android:layout_width="34sp"
                 android:layout_height="34sp"
-                android:layout_gravity="center_horizontal"
                 android:src="@drawable/ic_light_bulb"/>
             <TextView
                 android:id="@+id/light_bulbs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <ImageView
+                android:layout_width="40sp"
+                android:layout_height="40sp"
+                android:src="@drawable/ic_house"/>
+            <TextView
+                android:id="@+id/houses"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="30sp"/>
@@ -53,9 +68,9 @@
         android:layout_weight=".38">
         <ImageView
             android:id="@+id/chart_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10sp"/>
     </FrameLayout>
 
 </LinearLayout>

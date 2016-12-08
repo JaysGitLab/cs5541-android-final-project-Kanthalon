@@ -6,6 +6,8 @@
     <color name="blue_sky">#A0A0F0</color>
     <color name="blue_horizon">#8080E0</color>
     <color name="blue_history">#D0D0F0</color>
+    <color name="blue_details">#70A0D0</color>
+    <color name="purple_project">#A080F0</color>
     <color name="green_hill">#40B050</color>
     <color name="green_grass">#408044</color>
     <color name="green_tree">#407040</color>
